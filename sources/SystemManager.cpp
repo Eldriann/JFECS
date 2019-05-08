@@ -32,14 +32,20 @@ jf::systems::SystemManager::~SystemManager()
             break;
         case AWAKING:
             system.second.second->onAwake();
+#ifdef __unix__
             __attribute__((fallthrough));
+#endif
         case STARTING:
             system.second.second->onStart();
+#ifdef __unix__
             __attribute__((fallthrough));
+#endif
         case RUNNING:
         case STOPPING:
             system.second.second->onStop();
+#ifdef __unix__
             __attribute__((fallthrough));
+#endif
         case STOPPED:
         case TEARING_DOWN:
             system.second.second->onTearDown();

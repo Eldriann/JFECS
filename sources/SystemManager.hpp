@@ -270,7 +270,7 @@ namespace jf {
             if (system == _systems.end()) {
                 throw SystemNotFoundException("System not found", "getSystem");
             }
-            return *system->second.second;
+            return *static_cast<T *>(system->second.second);
         }
 
     }

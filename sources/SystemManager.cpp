@@ -8,8 +8,8 @@
 /* Created the 20/04/2019 at 21:54 by jfrabel */
 
 #include <vector>
+#include <iostream>
 #include "SystemManager.hpp"
-
 
 jf::systems::SystemManager &jf::systems::SystemManager::getInstance()
 {
@@ -65,24 +65,48 @@ void jf::systems::SystemManager::tick()
         case NOT_STARTED:
             break;
         case AWAKING:
-            system.second.second->onAwake();
+            try {
+                system.second.second->onAwake();
+            } catch (std::exception &e) {
+                addError(*system.second.second, e.what(), ErrorReport::ERROR_TYPE_ON_AWAKE);
+                system.second.first = NOT_STARTED;
+                continue;
+            }
             system.second.first = STARTING;
             break;
         case STARTING:
-            system.second.second->onStart();
+            try {
+                system.second.second->onStart();
+            } catch (std::exception &e) {
+                addError(*system.second.second, e.what(), ErrorReport::ERROR_TYPE_ON_START);
+                system.second.first = STOPPED;
+                continue;
+            }
             system.second.first = RUNNING;
             break;
         case RUNNING:
-            system.second.second->onUpdate(elapsedTime);
+            try {
+                system.second.second->onUpdate(elapsedTime);
+            } catch (std::exception &e) {
+                addError(*system.second.second, e.what(), ErrorReport::ERROR_TYPE_ON_UPDATE);
+            }
             break;
         case STOPPING:
-            system.second.second->onStop();
+            try {
+                system.second.second->onStop();
+            } catch (std::exception &e) {
+                addError(*system.second.second, e.what(), ErrorReport::ERROR_TYPE_ON_STOP);
+            }
             system.second.first = STOPPED;
             break;
         case STOPPED:
             break;
         case TEARING_DOWN:
-            system.second.second->onTearDown();
+            try {
+                system.second.second->onTearDown();
+            } catch (std::exception &e) {
+                addError(*system.second.second, e.what(), ErrorReport::ERROR_TYPE_ON_TEARDOWN);
+            }
             delete system.second.second;
             toErase.push_back(system.first);
             break;
@@ -101,4 +125,18 @@ float jf::systems::SystemManager::getTimeScale() const
 void jf::systems::SystemManager::setTimeScale(float scale)
 {
     _timeScale = scale;
+}
+
+std::vector<jf::systems::SystemManager::ErrorReport> jf::systems::SystemManager::getErrors()
+{
+    std::vector<ErrorReport> toReturn = _errors;
+    _errors.clear();
+    return toReturn;
+}
+
+void jf::systems::SystemManager::addError(jf::systems::ISystem &sys, const std::string &msg,
+                                          jf::systems::SystemManager::ErrorReport::ErrorType type)
+{
+    ErrorReport newErr = {sys, msg, type};
+    _errors.push_back(newErr);
 }

@@ -33,11 +33,11 @@ namespace jf {
          */
         enum SystemState {
             NOT_STARTED, /*!< The system is not started and will awake if start is called */
-            AWAKING, /*!< The system will be awaked in next tick */
+            AWAKING, /*!< The system will be awaken in next tick */
             STARTING, /*!< The system will be started in next tick */
             RUNNING, /*!< The system is running and will be updated in next tick */
-            STOPPING, /*!< The system will be stoped in next tick */
-            STOPPED, /*!< The system is stoped and nothing will be done in next tick */
+            STOPPING, /*!< The system will be stopped in next tick */
+            STOPPED, /*!< The system is stopped and nothing will be done in next tick */
             TEARING_DOWN /*!< The system is tearing down, you should not use it anymore (used on engine destruction) */
         };
 
@@ -46,6 +46,20 @@ namespace jf {
          * @brief A singleton class used to manage systems
          */
         class SystemManager {
+        public:
+            struct ErrorReport {
+                enum ErrorType {
+                    ERROR_TYPE_ON_AWAKE,
+                    ERROR_TYPE_ON_START,
+                    ERROR_TYPE_ON_UPDATE,
+                    ERROR_TYPE_ON_STOP,
+                    ERROR_TYPE_ON_TEARDOWN,
+                };
+                ISystem &system;
+                std::string error;
+                ErrorType type;
+            };
+
         public:
             /*!
              * @brief cpy ctor
@@ -65,13 +79,13 @@ namespace jf {
             SystemManager &operator=(const SystemManager &rhs) = delete;
 
             /*!
-             * @brief Static function used to retreive the instance of this singleton class
+             * @brief Static function used to retrieve the instance of this singleton class
              * @return The instance of this class
              */
             static SystemManager &getInstance();
 
             /*!
-             * @brief Get the the current timescale (usefull when time manipulation is required)
+             * @brief Get the the current timescale (useful when time manipulation is required)
              * @return The current timescale
              */
             float getTimeScale() const;
@@ -106,6 +120,12 @@ namespace jf {
              * In the best of all words the game loop will only have a call to this function while the game is running
              */
             void tick();
+
+            /*!
+             * @brief Return all the errors that occurred since getErrors was last called
+             * @return A vector of errors
+             */
+            std::vector<ErrorReport> getErrors();
 
             /*!
              * @brief Add a system to the existing systems
@@ -154,10 +174,19 @@ namespace jf {
              */
             SystemManager();
 
+            /*!
+             * @brief Add an error
+             * @param sys The system
+             * @param msg The message
+             * @param type The type
+             */
+            void addError(ISystem &sys, const std::string &msg, ErrorReport::ErrorType type);
+
         private:
             std::unordered_map<std::type_index, std::pair<SystemState, ISystem *>> _systems; /*!< The systems */
             float _timeScale; /*!< A scaler for the time used (1 by default) */
             std::chrono::steady_clock::time_point _last; /*!< The internal clock used to compute time manipulations */
+            std::vector<ErrorReport> _errors; /*!< The errors that happened since getErrors() was last called */
         };
 
 

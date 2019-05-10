@@ -221,6 +221,14 @@ You can get the instance of this singleton class with `jf::systems::SystemManage
 
 With the system manager you can add, remove, start, stop and tick systems.
 
+When ticking if an error is throwed it will be caught by the SystemManager (if the exception derive from `std::exception`).
+You can retrieve errors and handle them as you like by using the function:
+```cpp
+std::vector<ErrorReport> getErrors();
+```
+
+An `ErrorReport` is composed of a reference to the system that throwed the exception (as an ISystem, so you need to dynamic cast it if you want to use your functions), the error message and an `ErrorType` describing the state of the system when the exception was throwed.
+
 To add or remove a system you need to call the following functions:
 ```cpp
 template<typename T, typename ...Params>

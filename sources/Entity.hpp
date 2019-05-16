@@ -161,7 +161,7 @@ namespace jf {
              * @brief Return if the entity is marked as to keep
              * @return true if should be keeped false otherwise
              */
-            bool shouldBeKeeded() const;
+            bool shouldBeKeeped() const;
 
         private:
             const internal::ID _id; /*!< An id identifing this object (will be unique) */

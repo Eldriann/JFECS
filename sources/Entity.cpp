@@ -51,7 +51,7 @@ void jf::entities::Entity::setShouldBeKeeped(bool keep)
     _shouldBeKeeped = keep;
 }
 
-bool jf::entities::Entity::shouldBeKeeded() const
+bool jf::entities::Entity::shouldBeKeeped() const
 {
     return _shouldBeKeeped;
 }

@@ -112,7 +112,7 @@ std::vector<jf::entities::EntityHandler> jf::entities::EntityManager::getEntitie
 void jf::entities::EntityManager::deleteAllEntities()
 {
     while (!_entities.empty()) {
-        if (!_entities.begin()->second->shouldBeKeeded())
+        if (!_entities.begin()->second->shouldBeKeeped())
             deleteEntity(_entities.begin()->first);
     }
 }

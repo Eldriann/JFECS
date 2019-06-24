@@ -22,6 +22,7 @@ jf::entities::Entity::~Entity()
 {
     for (auto &i : _components) {
         delete i.second;
+        i.second = nullptr;
     }
     events::EventManager::getInstance().emit<events::EntityDestroyedEvent>({this});
 }

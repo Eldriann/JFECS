@@ -155,6 +155,13 @@ bool deleteEntity(const internal::ID &entityID);
 ```
 > **INFO**: For this and the following functions please see the [documentation](#documentation) or the [examples](#examples) for details on how to use them.
 
+If you are in an applyToEach loop or if you are iterating on entities better use safeDeleteEntity:
+```cpp
+void safeDeleteEntity(const internal::ID &entityID);
+```
+> **INFO**: For this and the following functions please see the [documentation](#documentation) or the [examples](#examples) for details on how to use them.
+> **INFO**: You will need to call in a safe spot (like your main loop the function `applySafeDelete` to take effects of safeDelete)
+
 The function used to retrieve an entity by its identifiers are as follow:
 ```cpp
 EntityHandler getEntityByID(const internal::ID &entityID);

@@ -17,7 +17,7 @@ jf::entities::EntityManager &jf::entities::EntityManager::getInstance()
 }
 
 jf::entities::EntityManager::EntityManager()
-    : _maxId(0), _entities(), _freeIDs()
+    : _maxId(0), _entities(), _freeIDs(), _toDestroyIDs()
 {
 
 }
@@ -111,8 +111,26 @@ std::vector<jf::entities::EntityHandler> jf::entities::EntityManager::getEntitie
 
 void jf::entities::EntityManager::deleteAllEntities()
 {
-    while (!_entities.empty()) {
-        if (!_entities.begin()->second->shouldBeKeeped())
-            deleteEntity(_entities.begin()->first);
+    auto entity = std::find_if(_entities.begin(), _entities.end(), [](const std::pair<internal::ID, Entity *> &pair) {
+        return !pair.second->shouldBeKeeped();
+    });
+    while (entity != _entities.end()) {
+        deleteEntity(entity->first);
+        entity = std::find_if(_entities.begin(), _entities.end(), [](const std::pair<internal::ID, Entity *> &pair) {
+            return !pair.second->shouldBeKeeped();
+        });
     }
+}
+
+void jf::entities::EntityManager::safeDeleteEntity(const jf::internal::ID &entityID)
+{
+    _toDestroyIDs.push_back(entityID);
+}
+
+void jf::entities::EntityManager::applySafeDelete()
+{
+    for (auto &id : _toDestroyIDs) {
+        unregisterEntity(id);
+    }
+    _toDestroyIDs.clear();
 }

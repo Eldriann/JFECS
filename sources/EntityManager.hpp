@@ -79,11 +79,22 @@ namespace jf {
              * @return true if the entity existed and was deleted false otherwise
              */
             bool deleteEntity(const internal::ID &entityID);
+            /*!
+             * @brief Delete an entity given it's id
+             * @param entityID The id of the entity to delete
+             * @return true if the entity existed and was deleted false otherwise
+             */
+            void safeDeleteEntity(const internal::ID &entityID);
 
             /*!
              * @brief Delete all the existing entities except the ones marked as shouldBeKeeped
              */
             void deleteAllEntities();
+
+            /*!
+             * @brief Delete entities that have been marked for safe delete.
+             */
+            void applySafeDelete();
 
             /*!
              * @brief Get an entity given an ID
@@ -150,6 +161,7 @@ namespace jf {
             uint64_t _maxId; /*!< The last biggest existing entity */
             std::unordered_map<internal::ID, Entity *> _entities; /*!< A map containing all the existing entities */
             std::queue<internal::ID> _freeIDs; /*!< Ids destroyed and not used */
+            std::vector<internal::ID> _toDestroyIDs; /*!< Ids of entities to destroy */
         };
 
         template<typename C, typename... Others>
